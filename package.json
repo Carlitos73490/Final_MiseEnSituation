@@ -9,6 +9,7 @@
   "author": "Carl Fuchs",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^4.6.0",
     "express": "^4.17.1",
     "mongodb": "^3.6.5",
     "vue": "^2.6.12",

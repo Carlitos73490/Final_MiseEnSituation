@@ -2,9 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title>Mise En Situation</title>
+    <link rel="stylesheet" href="public/css/style.css">
+    <link rel="stylesheet" href="public/css/bootstrap.css">
 
+</head>
+
+<body>
+<main id="app">
+    <div class="vh-100">
+        <button @click="displayUI=!displayUI">
+            {{displayUI?"cacher":"afficher"}}
+        </button>
+        <div class="d-flex h-100">
+            <div class="w-75 h-100">
+                <header v-show="displayUI" class="d-flex justify-content-center bg-primary" ><h1 class="font-weight-bold">Mise en Situation</h1></header>
+            </div>
+            <div class="w-25 h-100 bg-secondary" >
+                <h1>{{displayUI}}</h1>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="public/js/vue.js"></script>
+<script src="public/js/vue-resource.min.js"></script>
+<script src="public/js/main.js"></script>
 </body>
 </html>
