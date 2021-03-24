@@ -1,0 +1,15 @@
+.btnResize{
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    top : 0px;
+    left : 0px;
+}
+
+#portalCanvas{
+    transform-origin: 0 0 ;
+}
+img::selection{
+background: transparent;
+}
