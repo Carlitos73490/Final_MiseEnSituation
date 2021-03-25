@@ -35,15 +35,20 @@
                     <h3>New portal color</h3>
                     <input type="text" v-model="newPortal.color">
                     <h3>New portal image</h3>
-                    <input type="file" @change="portalImageChanged">
+                    <input type="file" @change="newPortalImageChanged">
                     <img id="portalImgUpload" v-bind:src="portalObjectUrl">
                     <button @click="add">Submit Portal</button>
                 </article>
-                <div v-for="portal of portals">
-                    <h5>{{portal.name}}</h5>
-                    <h6>{{portal.color}}</h6>
-                    <img :src="portal.imgDataUrl">
+                <div class="overflow-auto d-flex flex-wrap justify-content-center align-items-center p-2">
+                    <div class="m-2 border-0 bg-light" v-for="portal of portals" @click="portalImageChanged">
+                        <div class="d-flex flex-column justify-content-center align-items-center">
+                            <h5>{{portal.name}}</h5>
+                            <h6>{{portal.color}}</h6>
+                        </div>
+                        <img style="height: 60px; width: auto;" :src="portal.imgDataUrl">
+                    </div>
                 </div>
+
             </div>
         </div>
 </main>

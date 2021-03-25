@@ -27,7 +27,7 @@ const app = new Vue({
                 method: 'post',
                 url: '/portals/add',
                 data: this.newPortal
-            }).then(function(response){
+            }).then(() => {
                 console.log("Reponse");
                 this.portals.push(this.newPortal)
                 this.initForm()
@@ -43,7 +43,43 @@ const app = new Vue({
                 nbVantaux : "A",
             }
         },
-        async portalImageChanged(event){
+        portalImageChanged(event){
+            let svgPortal = new Image();
+
+            let parentWidth = this.parentCanvas.clientWidth;
+            let parentHeight = this.parentCanvas.clientHeight;
+            console.log("parentWidth" + parentWidth)
+            console.log("parentheight" + parentHeight)
+            let svgPortalAdjustedWidth;
+            let svgPortalAdjustedHeight;
+            svgPortal.onload = () => {
+                //Conserver le ratio;
+                console.group("svgportal.OnLoad");
+                if (svgPortal.height <= svgPortal.width) {
+                    svgPortalAdjustedWidth = parentWidth;
+                    svgPortalAdjustedHeight = svgPortal.height * Math.round(parentWidth) / svgPortal.width;
+                    if (svgPortalAdjustedHeight > parentHeight) {
+                        let reduce = svgPortalAdjustedHeight - parentHeight
+                        svgPortalAdjustedHeight = svgPortalAdjustedHeight - reduce;
+                        svgPortalAdjustedWidth = svgPortalAdjustedWidth - reduce;
+                    }
+                } else {
+                    svgPortalAdjustedWidth = svgPortal.width * Math.round(parentHeight) / svgPortal.height;
+                    svgPortalAdjustedHeight = parentHeight;
+                    if (svgPortalAdjustedWidth > parentWidth) {
+                        let reduce = svgPortalAdjustedWidth - parentWidth
+                        svgPortalAdjustedHeight = svgPortalAdjustedHeight - reduce;
+                        svgPortalAdjustedWidth = svgPortalAdjustedWidth - reduce;
+                    }
+                }
+                this.portalCanvas.width = svgPortalAdjustedWidth;
+                this.portalCanvas.height = svgPortalAdjustedHeight;
+                this.portalCanvas.getContext("2d").drawImage(svgPortal, 0, 0, svgPortalAdjustedWidth, svgPortalAdjustedHeight);
+            }
+            svgPortal.src = "https://homepages.cae.wisc.edu/~ece533/images/airplane.png";
+        },
+
+        async newPortalImageChanged(event){
             this.portalObjectUrl = URL.createObjectURL(event.target.files.item(0));
             let blob = await fetch(this.portalObjectUrl).then(r => r.blob());
             let dataUrl = await new Promise(resolve => {
@@ -53,6 +89,9 @@ const app = new Vue({
             });
             this.newPortal.imgDataUrl = dataUrl
             console.log(dataUrl);
+        },
+        portalImageChanged(event){
+
         },
         backgroundImageChanged(event){
             console.log(event.target.files)
