@@ -28,23 +28,28 @@
                 <form ref="form">
                     <input type="file" @change="backgroundImageChanged" >
                 </form>
-                <div class="d-flex "><h2 class="bg-primary">Liste Portail</h2><button @click="displayFormPortal=!displayFormPortal"> {{displayFormPortal?"-":"+"}}</button></div>
-                <form v-show="displayFormPortal">
+                <div class="d-flex "><h2 class="bg-primary">Liste Portail</h2><button @click="initForm" >{{displayFormPortal?"-":"+"}}</button></div>
+                <article v-show="displayFormPortal">
                     <h3>New portal name</h3>
                     <input type="text" v-model="newPortal.name">
                     <h3>New portal color</h3>
                     <input type="text" v-model="newPortal.color">
                     <h3>New portal image</h3>
                     <input type="file" @change="portalImageChanged">
-                    <img v-bind:src="newPortal.imgDataUrl">
-                    <IMG SRC="data:image;base64,R0lGODdhMAAwAPAAAAAAAP///ywAAAAAMAAw AAAC8IyPqcvt3wCcDkiLc7C0qwyGHhSWpjQu5yqmCYsapyuvUUlvONmOZtfzgFz ByTB10QgxOR0TqBQejhRNzOfkVJ+5YiUqrXF5Y5lKh/DeuNcP5yLWGsEbtLiOSp a/TPg7JpJHxyendzWTBfX0cxOnKPjgBzi4diinWGdkF8kjdfnycQZXZeYGejmJl ZeGl9i2icVqaNVailT6F5iJ90m6mvuTS4OK05M0vDk0Q4XUtwvKOzrcd3iq9uis F81M1OIcR7lEewwcLp7tuNNkM3uNna3F2JQFo97Vriy/Xl4/f1cf5VWzXyym7PH hhx4dbgYKAAA7" ALT="Larry">
-                    <img src="data:image;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPHRpdGxlPkVycm9yPC90aXRsZT4KPC9oZWFkPgo8Ym9keT4KPHByZT5DYW5ub3QgR0VUIC9bb2JqZWN0JTIwRmlsZV08L3ByZT4KPC9ib2R5Pgo8L2h0bWw+Cg==">
-                </form>
+                    <img id="portalImgUpload" v-bind:src="portalObjectUrl">
+                    <button @click="add">Submit Portal</button>
+                </article>
+                <div v-for="portal of portals">
+                    <h5>{{portal.name}}</h5>
+                    <h6>{{portal.color}}</h6>
+                    <img :src="portal.imgDataUrl">
+                </div>
             </div>
         </div>
 </main>
 <script src="public/js/vue.js"></script>
 <script src="public/js/vue-resource.min.js"></script>
 <script src="public/js/main.js"></script>
+<script src="public/js/axios.js"></script>
 </body>
 </html>

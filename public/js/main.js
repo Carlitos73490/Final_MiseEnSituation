@@ -1,37 +1,55 @@
 
+
 const app = new Vue({
     el : "#app",
     data : {
         displayFormPortal : false,
         displayUI : false,
+        portalObjectUrl : null,
         backgroundImgPath : "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
-        portalCanvas : {},
+        portalCanvas : null,
+        portals : {},
         newPortal :{},
         p: null,
-        mx: {},
-        my: {},
-        px: {},
-        py: {},
+        mx: null,
+        my: null,
+        px: null,
+        py: null,
         btnTopLeftHtml : null,
         btnTopRightHtml : null,
         btnBottomLeftHtml : null,
         btnBottomRightHtml : null,
     },
     methods : {
-
+        add :function (){
+            console.log("Click Envoyé");
+            axios({
+                method: 'post',
+                url: '/portals/add',
+                data: this.newPortal
+            }).then(function(response){
+                console.log("Reponse");
+                this.portals.push(this.newPortal)
+                this.initForm()
+            });
+        },
         initForm : function (){
+        this.displayFormPortal=! this.displayFormPortal
             this.newPortal = {
-                name : "unPortal",
-                color : "loremRouge",
-                imgDataUrl : "",
+                name : "A",
+                color : "A",
+                imgDataUrl : "A",
+                dimensions :"A",
+                nbVantaux : "A",
             }
         },
         async portalImageChanged(event){
-            let blob = await fetch(event.target.files.item(0)).then(r => r.blob());
+            this.portalObjectUrl = URL.createObjectURL(event.target.files.item(0));
+            let blob = await fetch(this.portalObjectUrl).then(r => r.blob());
             let dataUrl = await new Promise(resolve => {
                 let reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
+                reader.readAsDataURL(blob)
             });
             this.newPortal.imgDataUrl = dataUrl
             console.log(dataUrl);
@@ -193,9 +211,7 @@ const app = new Vue({
             for(let key in params) {
                 s += key + "=" + encodeURIComponent(params[key]) +"&"
             }
-            setTimeout(() =>{
-                this.loading = false
-            },300)
+
             return this.$http.get(s);
         }
     },
@@ -208,7 +224,10 @@ const app = new Vue({
         this.btnBottomRightHtml = document.getElementById("btnBottomRight")
         this.portalCanvas = document.getElementById("portalCanvas");
         this.parentCanvas = document.getElementById("parentCanvas");
-
         this.drawPortal();
+        this.ajax("/portals/list").then(function(response){
+            console.log(response.body)
+            this.portals = response.body
+        })
     }
 })
