@@ -6,7 +6,7 @@ const app = new Vue({
         displayFormPortal : false,
         displayUI : false,
         portalObjectUrl : null,
-        backgroundImgPath : "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
+        backgroundImgPath : null,
         portalCanvas : null,
         portals : {},
         newPortal :{},
@@ -19,67 +19,90 @@ const app = new Vue({
         btnTopRightHtml : null,
         btnBottomLeftHtml : null,
         btnBottomRightHtml : null,
+        firstPortalLoad : true,
+        clickOnCanvas : false,
+        mx : null,
+        my : null,
     },
     methods : {
         add :function (){
-            console.log("Click Envoyé");
             axios({
                 method: 'post',
                 url: '/portals/add',
                 data: this.newPortal
             }).then(() => {
-                console.log("Reponse");
                 this.portals.push(this.newPortal)
                 this.initForm()
             });
-            this.portals.push(this.newPortal)
+        },
+        deletePortal(portalId){
+            axios({
+                method: 'get',
+                url: '/portals/delete',
+                data: portalId
+            }).then(() => {
+                this.ajax("/portals/list").then(function(response){
+                    this.portals = response.body
+                })
+            });
         },
         initForm : function (){
         this.displayFormPortal=! this.displayFormPortal
             this.newPortal = {
-                name : "A",
-                color : "A",
-                imgDataUrl : "A",
-                dimensions :"A",
-                nbVantaux : "A",
+                name : "",
+                color : "",
+                nbVantaux : "",
+                imgDataUrl : "",
+
             }
         },
         portalImageChanged(portal){
             console.log("portalChanged")
-            let svgPortal = new Image();
-
-            let parentWidth = this.parentCanvas.clientWidth;
-            let parentHeight = this.parentCanvas.clientHeight;
-
-            let svgPortalAdjustedWidth;
-            let svgPortalAdjustedHeight;
-            svgPortal.onload = () => {
-                //Conserver le ratio;
-                console.group("svgportal.OnLoad");
-                if (svgPortal.height <= svgPortal.width) {
-                    svgPortalAdjustedWidth = parentWidth;
-                    svgPortalAdjustedHeight = svgPortal.height * Math.round(parentWidth) / svgPortal.width;
-                    if (svgPortalAdjustedHeight > parentHeight) {
-                        let reduce = svgPortalAdjustedHeight - parentHeight
-                        svgPortalAdjustedHeight = svgPortalAdjustedHeight - reduce;
-                        svgPortalAdjustedWidth = svgPortalAdjustedWidth - reduce;
-                    }
-                } else {
-                    svgPortalAdjustedWidth = svgPortal.width * Math.round(parentHeight) / svgPortal.height;
-                    svgPortalAdjustedHeight = parentHeight;
-                    if (svgPortalAdjustedWidth > parentWidth) {
-                        let reduce = svgPortalAdjustedWidth - parentWidth
-                        svgPortalAdjustedHeight = svgPortalAdjustedHeight - reduce;
-                        svgPortalAdjustedWidth = svgPortalAdjustedWidth - reduce;
-                    }
+            this.drawPortal(portal.imgDataUrl).then((value) =>{
+                if(this.firstPortalLoad) {
+                    this.centerPortal()
                 }
-                this.portalCanvas.width = svgPortalAdjustedWidth;
-                this.portalCanvas.height = svgPortalAdjustedHeight;
-                this.portalCanvas.getContext("2d").drawImage(svgPortal, 0, 0, svgPortalAdjustedWidth, svgPortalAdjustedHeight);
-            }
-            svgPortal.src = portal.src;
-        },
+            })
 
+        },
+        centerPortal(){
+            if (this.firstPortalLoad) {
+                let BoudingBox = this.portalCanvas.getBoundingClientRect();
+
+                let margin = 100;
+
+                let pTopLeftY = 0 - (this.btnTopLeftHtml.clientWidth / 2) ;
+                let pTopLeftX = 0 + (BoudingBox.left - (this.btnTopLeftHtml.clientWidth / 2));
+
+                let pTopRightY = (0 - this.btnTopRightHtml.clientWidth / 2) ;
+                let pTopRightX = (BoudingBox.right - this.btnTopRightHtml.clientWidth / 2) - margin;
+
+                let pBottomLeftY = (BoudingBox.bottom - BoudingBox.top - this.btnBottomLeftHtml.clientWidth / 2) - margin ;
+                let pBottomLeftX = 0 + (BoudingBox.left - this.btnBottomLeftHtml.clientWidth / 2);
+
+                let pBottomRightY = (BoudingBox.bottom - BoudingBox.top - this.btnBottomRightHtml.clientWidth / 2) - margin;
+                let pBottomRightX = (BoudingBox.right - this.btnBottomRightHtml.clientWidth / 2) - margin;
+
+
+                let ox = this.parentCanvas.clientWidth / 2 - (pTopRightX - pTopLeftX) / 2 ;
+
+                let oy = margin/2
+
+                this.btnTopLeftHtml.style.top = (pTopLeftY + oy).toString() + "px";
+                this.btnTopLeftHtml.style.left = (pTopLeftX + ox).toString() + "px";
+
+                this.btnTopRightHtml.style.top = (pTopRightY + oy).toString() + "px";
+                this.btnTopRightHtml.style.left = (pTopRightX  + ox).toString() + "px";
+
+                this.btnBottomLeftHtml.style.top = (pBottomLeftY).toString() + "px";
+                this.btnBottomLeftHtml.style.left = (pBottomLeftX + ox).toString() + "px";
+
+                this.btnBottomRightHtml.style.top = (pBottomRightY).toString() + "px";
+                this.btnBottomRightHtml.style.left = (pBottomRightX + ox).toString() + "px";
+
+                this.firstPortalLoad = false;
+            }
+        },
         async newPortalImageChanged(event){
             this.portalObjectUrl = URL.createObjectURL(event.target.files.item(0));
             let blob = await fetch(this.portalObjectUrl).then(r => r.blob());
@@ -96,18 +119,16 @@ const app = new Vue({
             this.backgroundImgPath = URL.createObjectURL(event.target.files.item(0));
         },
 
-        drawPortal() {
+        drawPortal(ImageSrc) {
+            var canvasPortalLoaded = new Promise((resolve, reject) => {
             let svgPortal = new Image();
-
             let parentWidth = this.parentCanvas.clientWidth;
             let parentHeight = this.parentCanvas.clientHeight;
-            console.log("parentWidth" + parentWidth)
-            console.log("parentheight" + parentHeight)
+
             let svgPortalAdjustedWidth;
             let svgPortalAdjustedHeight;
             svgPortal.onload = () => {
                 //Conserver le ratio;
-                console.group("svgportal.OnLoad");
                 if (svgPortal.height <= svgPortal.width) {
                     svgPortalAdjustedWidth = parentWidth;
                     svgPortalAdjustedHeight = svgPortal.height * Math.round(parentWidth) / svgPortal.width;
@@ -128,29 +149,62 @@ const app = new Vue({
                 this.portalCanvas.width = svgPortalAdjustedWidth;
                 this.portalCanvas.height = svgPortalAdjustedHeight;
                 this.portalCanvas.getContext("2d").drawImage(svgPortal, 0, 0, svgPortalAdjustedWidth, svgPortalAdjustedHeight);
+                resolve(true);
             }
-            svgPortal.src = "https://homepages.cae.wisc.edu/~ece533/images/airplane.png";
+                svgPortal.src = ImageSrc;
+            });
+            return canvasPortalLoaded;
         },
         MouseDownBtn(event) {
                 this.p = event.target;
                 this.px = parseFloat(this.p.style.left);
                 this.py = parseFloat(this.p.style.top);
+
+        },
+        MouseDownCanvas(event) {
+            this.clickOnCanvas = true;
+            this.px = parseFloat(this.btnTopLeftHtml.style.left);
+            this.py = parseFloat(this.btnTopLeftHtml.style.top);
+            this.mx = event.clientX;
+            this.my = event.clientY;
         },
         MouseMove(event) {
-        if (this.p) {
-            console.log("p")
-            var dx = event.clientX ;
+            var dx = event.clientX  ;
             var dy = event.clientY ;
+        if(this.clickOnCanvas){
+            this.px = dx - this.mx;
+            this.py = dy - this.my;
+
+            let offsetBottomLeftX = parseFloat(this.btnBottomLeftHtml.style.left) - parseFloat(this.btnTopLeftHtml.style.left);
+            let offsetBottomLeftY = parseFloat(this.btnBottomLeftHtml.style.top) - parseFloat(this.btnTopLeftHtml.style.top);
+            let offsetTopRightX = parseFloat(this.btnTopRightHtml.style.left) - parseFloat(this.btnTopLeftHtml.style.left);
+            let offsetTopRightY = parseFloat(this.btnTopRightHtml.style.top) - parseFloat(this.btnTopLeftHtml.style.top);
+
+            let offsetBottomRightX = parseFloat(this.btnBottomRightHtml.style.left) - parseFloat(this.btnTopLeftHtml.style.left);
+            let offsetBottomRightY = parseFloat(this.btnBottomRightHtml.style.top) - parseFloat(this.btnTopLeftHtml.style.top);
+
+            this.btnTopLeftHtml.style.left = this.px + "px";
+            this.btnTopLeftHtml.style.top = this.py + "px";
+            this.btnTopRightHtml.style.left = this.px + offsetTopRightX + "px";
+            this.btnTopRightHtml.style.top = this.py + offsetTopRightY + "px";
+            this.btnBottomLeftHtml.style.left = this.px + offsetBottomLeftX + "px";
+            this.btnBottomLeftHtml.style.top = this.py + offsetBottomLeftY + "px";
+            this.btnBottomRightHtml.style.left = this.px + offsetBottomRightX + "px";
+            this.btnBottomRightHtml.style.top = this.py + offsetBottomRightY + "px";
+
+
+        } else if (this.p) {
                 this.px = dx;
                 this.py = dy;
                 this.p.style.top = this.py + "px";
                 this.p.style.left = this.px + "px";
-                this.TransformCenter();
         }
+            this.TransformCenter();
 
         },
          MouseUp(event) {
             this.p = null;
+            this.clickOnCanvas = false;
             this.TransformCenter();
         },
          TransformCenter() {
@@ -163,6 +217,7 @@ const app = new Vue({
         Center(HTMLDivElement) {
                 return { x: Math.round(parseFloat(HTMLDivElement.style.left) + HTMLDivElement.clientWidth / 2), y: Math.round(parseFloat(HTMLDivElement.style.top) + HTMLDivElement.clientHeight / 2) };
         },
+
 
 
          adj(m) { // Compute the adjugate of m
@@ -261,7 +316,6 @@ const app = new Vue({
         this.btnBottomRightHtml = document.getElementById("btnBottomRight")
         this.portalCanvas = document.getElementById("portalCanvas");
         this.parentCanvas = document.getElementById("parentCanvas");
-        this.drawPortal();
         this.ajax("/portals/list").then(function(response){
             console.log(response.body)
             this.portals = response.body

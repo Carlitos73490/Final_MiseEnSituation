@@ -16,7 +16,7 @@
                         <div class="position-relative h-100 d-flex align-items-center" id="parentCanvas" @mousemove="MouseMove" @mouseup="MouseUp">
 <!--                            <canvas class="position-absolute" id="backgroundCanvas" width="0" height="0"></canvas>-->
                             <img class="mh-100 position-absolute w-100"  v-bind:src="backgroundImgPath"/>
-                            <canvas class="position-absolute" id="portalCanvas" style="transform: none;"width="0" height="0"></canvas>
+                            <canvas class="position-absolute" id="portalCanvas" style="transform: none;"width="0" height="0" @mousedown="MouseDownCanvas"></canvas>
                             <div class="btnResize  position-absolute" id="btnTopLeft" style="top : 0px; left:0px;" @mousedown="MouseDownBtn"></div>
                             <div class="btnResize  position-absolute" id ="btnTopRight" style="top : 0px; left:0px;" @mousedown="MouseDownBtn"></div>
                             <div class="btnResize  position-absolute" id="btnBottomLeft" style="top : 0px; left:0px;" @mousedown="MouseDownBtn"></div>
@@ -35,17 +35,22 @@
                     <h3>New portal color</h3>
                     <input type="text" v-model="newPortal.color">
                     <h3>New portal image</h3>
+                    <input type="range" v-model="newPortal.nbVantaux"
+                           min="1" max="2">
                     <input type="file" @change="newPortalImageChanged">
+
                     <img id="portalImgUpload" v-bind:src="portalObjectUrl">
                     <button @click="add">Submit Portal</button>
                 </article>
                 <div class="overflow-auto d-flex flex-wrap justify-content-center align-items-center p-2">
-                    <div class="m-2 border-0 bg-light" v-for="portal of portals" @click="portalImageChanged(portal)">
+                    <div class="m-2 border-0 bg-light" v-for="portal of portals" >
                         <div class="d-flex flex-column justify-content-center align-items-center">
                             <h5>{{portal.name}}</h5>
-                            <h6>{{portal.color}}</h6>
+                            <h6>color : {{portal.color}}</h6>
+                            <h6>vantaux : {{portal.nbVantaux}}</h6>
                         </div>
-                        <img style="height: 60px; width: auto;" :src="portal.imgDataUrl">
+                        <img style="height: 60px; width: auto;" :src="portal.imgDataUrl" @click="portalImageChanged(portal)">
+                        <a @click="deletePortal(portal.id)">Delete</a>
                     </div>
                 </div>
 

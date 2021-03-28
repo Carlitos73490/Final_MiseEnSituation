@@ -43,6 +43,14 @@ app.get("/portals/list", (req, res) => {
     //res.json(beers)
 })
 
+app.get("/portals/delete", (req, res) => {
+    console.log(req.body)
+    db.collection("portals").deleteOne(req.body,(err, docs) => {
+        console.log(err)
+        res.json(docs)
+    })
+})
+
 
 app.post("/portals/add", (req, res) => {
     //console.log('Got body:', req.body);
