@@ -40,7 +40,7 @@
                     <button @click="add">Submit Portal</button>
                 </article>
                 <div class="overflow-auto d-flex flex-wrap justify-content-center align-items-center p-2">
-                    <div class="m-2 border-0 bg-light" v-for="portal of portals" @click="portalImageChanged">
+                    <div class="m-2 border-0 bg-light" v-for="portal of portals" @click="portalImageChanged(portal)">
                         <div class="d-flex flex-column justify-content-center align-items-center">
                             <h5>{{portal.name}}</h5>
                             <h6>{{portal.color}}</h6>

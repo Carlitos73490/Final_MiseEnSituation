@@ -32,6 +32,7 @@ const app = new Vue({
                 this.portals.push(this.newPortal)
                 this.initForm()
             });
+            this.portals.push(this.newPortal)
         },
         initForm : function (){
         this.displayFormPortal=! this.displayFormPortal
@@ -43,13 +44,13 @@ const app = new Vue({
                 nbVantaux : "A",
             }
         },
-        portalImageChanged(event){
+        portalImageChanged(portal){
+            console.log("portalChanged")
             let svgPortal = new Image();
 
             let parentWidth = this.parentCanvas.clientWidth;
             let parentHeight = this.parentCanvas.clientHeight;
-            console.log("parentWidth" + parentWidth)
-            console.log("parentheight" + parentHeight)
+
             let svgPortalAdjustedWidth;
             let svgPortalAdjustedHeight;
             svgPortal.onload = () => {
@@ -76,7 +77,7 @@ const app = new Vue({
                 this.portalCanvas.height = svgPortalAdjustedHeight;
                 this.portalCanvas.getContext("2d").drawImage(svgPortal, 0, 0, svgPortalAdjustedWidth, svgPortalAdjustedHeight);
             }
-            svgPortal.src = "https://homepages.cae.wisc.edu/~ece533/images/airplane.png";
+            svgPortal.src = portal.src;
         },
 
         async newPortalImageChanged(event){
@@ -89,9 +90,6 @@ const app = new Vue({
             });
             this.newPortal.imgDataUrl = dataUrl
             console.log(dataUrl);
-        },
-        portalImageChanged(event){
-
         },
         backgroundImageChanged(event){
             console.log(event.target.files)
