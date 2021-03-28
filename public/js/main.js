@@ -51,9 +51,8 @@ const app = new Vue({
             this.newPortal = {
                 name : "",
                 color : "",
-                nbVantaux : "",
+                nbVantaux : 1,
                 imgDataUrl : "",
-
             }
         },
         portalImageChanged(portal){

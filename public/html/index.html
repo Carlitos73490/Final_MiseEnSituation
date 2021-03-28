@@ -5,7 +5,6 @@
     <title>Mise En Situation</title>
     <link rel="stylesheet" href="public/css/style.css">
     <link rel="stylesheet" href="public/css/bootstrap.css">
-
 </head>
 
 <body>
@@ -24,33 +23,49 @@
                         </div>
             </div>
             <div class="w-25 h-100 bg-secondary" >
-                <h2 class="bg-primary">Background Image</h2>
-                <form ref="form">
-                    <input type="file" @change="backgroundImageChanged" >
-                </form>
-                <div class="d-flex "><h2 class="bg-primary">Liste Portail</h2><button @click="initForm" >{{displayFormPortal?"-":"+"}}</button></div>
-                <article v-show="displayFormPortal">
-                    <h3>New portal name</h3>
+                <div class="m-2">
+                <h2 class="bg-primary p-2 text-white">Background Image</h2>
+                <input class="p-2" type="file" @change="backgroundImageChanged" >
+                </div>
+                <div class="d-flex m-2 ">
+                    <h2 class="bg-primary p-2 text-white">Portal List</h2>
+                    <button @click="initForm" >{{displayFormPortal?"-":"+"}}</button>
+                </div>
+
+                <article class="p-2 bg-light m-1" v-show="displayFormPortal">
+                    <div class="d-flex flex-row justify-content-between">
+                    <h3>name : </h3>
                     <input type="text" v-model="newPortal.name">
-                    <h3>New portal color</h3>
+                    </div>
+                    <div class="d-flex flex-row justify-content-between">
+                    <h3>color : </h3>
                     <input type="text" v-model="newPortal.color">
-                    <h3>New portal image</h3>
+                    </div >
+                    <div class="d-flex flex-row justify-content-between">
+                        <h3>nb vantaux : </h3>
                     <input type="range" v-model="newPortal.nbVantaux"
                            min="1" max="2">
+                        <h3>{{newPortal.nbVantaux}}</h3>
+                    </div>
+                    <div class="d-flex flex-row justify-content-between">
+                        <h4>image : </h4>
                     <input type="file" @change="newPortalImageChanged">
 
-                    <img id="portalImgUpload" v-bind:src="portalObjectUrl">
+                    <img style="height: 60px; width: auto;" id="portalImgUpload" v-bind:src="portalObjectUrl">
+                    </div>
                     <button @click="add">Submit Portal</button>
                 </article>
+
                 <div class="overflow-auto d-flex flex-wrap justify-content-center align-items-center p-2">
                     <div class="m-2 border-0 bg-light" v-for="portal of portals" >
                         <div class="d-flex flex-column justify-content-center align-items-center">
                             <h5>{{portal.name}}</h5>
                             <h6>color : {{portal.color}}</h6>
                             <h6>vantaux : {{portal.nbVantaux}}</h6>
+                            <img style="cursor: pointer;height: 60px; width: auto;" :src="portal.imgDataUrl" @click="portalImageChanged(portal)">
+                            <a style="cursor: pointer;" @click="deletePortal(portal.id)">Delete</a>
                         </div>
-                        <img style="height: 60px; width: auto;" :src="portal.imgDataUrl" @click="portalImageChanged(portal)">
-                        <a @click="deletePortal(portal.id)">Delete</a>
+
                     </div>
                 </div>
 

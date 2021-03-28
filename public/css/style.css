@@ -2,9 +2,13 @@
     border-radius: 50%;
     width: 20px;
     height: 20px;
-    background-color: red;
     top : 0px;
     left : 0px;
+    transition: background-color 1s ease-out;
+}
+#parentCanvas:hover .btnResize{
+    background-color: rgba(52, 235, 219,0.5);
+    transition: background-color 1s ease;
 }
 
 #portalCanvas{
