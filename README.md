@@ -1,5 +1,5 @@
 # Requirement
-###MongoDb DataBase 
+### MongoDb DataBase 
 * "Situation" Database
 * "portals" Collection
 ### Package NPM
@@ -11,7 +11,7 @@
 * Express
 * Bootstrap
 * mongodb
-#Briefing
+# Briefing
 Pour utiliser la mise en situation, on ajoute une photo de l'entrée de son habitation , puis autant de portail que l'on veut
 On peut ensuite s'amuser à déformer et déplacer le portail pour le faire visuellement correspondre à l'entrée.
 
